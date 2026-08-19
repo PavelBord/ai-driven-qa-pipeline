@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/test-contract.schema.json",
+  "title": "AI-driven QA Test Contract",
+  "description": "Structured test contract generated from business requirements.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["test_cases"],
+  "properties": {
+    "test_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/test_case"
+      }
+    }
+  },
+  "$defs": {
+    "test_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "requirement_id",
+        "title",
+        "description",
+        "priority",
+        "type",
+        "preconditions",
+        "steps",
+        "expected_result"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^TC-[A-Z0-9-]+$"
+        },
+        "requirement_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "negative",
+            "boundary",
+            "validation",
+            "security",
+            "regression"
+          ]
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "expected_result": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

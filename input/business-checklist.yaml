@@ -1,0 +1,37 @@
+project:
+  name: "AI-driven QA Demo"
+
+requirements:
+  - id: "AUTH-001"
+    title: "Successful authentication"
+    description: "Registered user can authenticate using valid credentials."
+    priority: "high"
+    test_data:
+      email: "user@example.com"
+      password: "DemoPassword123"
+
+  - id: "AUTH-002"
+    title: "Invalid password"
+    description: "Authentication must fail when an incorrect password is provided."
+    priority: "high"
+    test_data:
+      email: "user@example.com"
+      password: "WrongPassword123"
+
+  - id: "AUTH-003"
+    title: "Empty email"
+    description: "Authentication must fail when email is empty."
+    priority: "medium"
+
+  - id: "AUTH-004"
+    title: "Empty password"
+    description: "Authentication must fail when password is empty."
+    priority: "medium"
+
+  - id: "AUTH-005"
+    title: "Invalid email format"
+    description: "Authentication must fail when email has invalid format."
+    priority: "medium"
+    test_data:
+      email: "invalid-email"
+      password: "DemoPassword123"
