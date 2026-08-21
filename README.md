@@ -1,147 +1,221 @@
-# AI-Driven QA Pipeline
+# 🤖 AI-Driven QA Pipeline
 
-## Описание проекта
+## 📌 Overview
 
-AI-Driven QA Pipeline — это автоматизированный пайплайн для генерации QA-артефактов с использованием LLM.
+AI-Driven QA Pipeline — автоматизированный pipeline для генерации и проверки pytest автотестов на основе бизнес-требований.
 
-Цель проекта — автоматизировать процесс подготовки тестовой документации и автотестов:
+Проект демонстрирует использование LLM в процессе QA Automation:
 
-- анализ бизнес-требований;
-- защита данных (PII masking);
+- анализ требований;
+- защита тестовых данных от утечки PII;
 - генерация тестовых сценариев;
-- генерация pytest автотестов;
+- создание test contract;
+- генерация pytest-кода;
 - AI code review;
-- автоматическая валидация результатов.
+- автоматическая проверка качества кода.
 
-Проект использует локальную LLM через Ollama.
+Основная идея проекта:
+
+> Превратить бизнес-требование в готовый проверенный автотест с помощью AI.
 
 ---
 
-# Архитектура проекта
+# 🏗 Architecture
 
+Pipeline состоит из следующих этапов:
+
+```
 Business Requirements
-          |
-          v
+        |
+        v
 +----------------+
-|   PII Stage     |
-| Data Masking    |
+|  PII Detection |
+|  & Masking     |
 +----------------+
-          |
-          v
+        |
+        v
 +----------------+
-| Scenario       |
-| Generator     |
-| LLM           |
+| AI Scenario    |
+| Generator      |
 +----------------+
-          |
-          v
+        |
+        v
 +----------------+
-| Test Contract |
-| Validation    |
+| Test Contract  |
+| Validation     |
 +----------------+
-          |
-          v
+        |
+        v
 +----------------+
-| Code Generator|
-| Pytest        |
+| Pytest Code    |
+| Generation     |
 +----------------+
-          |
-          v
+        |
+        v
 +----------------+
-| Code Reviewer |
-| LLM Review    |
+| AI Code Review |
 +----------------+
-          |
-          v
+        |
+        v
 Generated Tests
+```
 
 ---
 
-# Основные возможности
+# 🚀 Features
 
-## 1. PII Protection
+## 🔐 PII Protection
 
-Перед передачей данных в LLM выполняется поиск и маскирование персональных данных.
+Перед передачей данных в AI pipeline выполняется проверка персональных данных.
+
+Поддерживается:
+
+- email detection;
+- password detection;
+- masking sensitive information.
 
 Пример:
 
 До:
 
 ```yaml
-email: user@test.com
-password: password123
+email: user@example.com
+password: secret123
+```
+
 После:
+
+```yaml
 email: <EMAIL>
 password: <PASSWORD>
-Создаются артефакты:
-artifacts/pii/
-├── pii-report.json
-└── masked-business-checklist.yaml
-2. Генерация тестовых сценариев
-AI анализирует бизнес-требования и создает тестовый контракт.
+```
+
+---
+
+## 🧠 AI Scenario Generation
+
+LLM анализирует бизнес-требования и создает тестовые сценарии.
+
+Генерируется:
+
+- test case ID;
+- requirement ID;
+- title;
+- description;
+- priority;
+- test steps;
+- expected result.
+
 Пример:
+
+```json
 {
-  "test_cases": [
-    {
-      "id": "TC-001",
-      "requirement_id": "AUTH-001",
-      "title": "Successful authentication",
-      "type": "positive",
-      "priority": "high"
-    }
-  ]
+  "id": "TC-001",
+  "requirement_id": "AUTH-001",
+  "title": "Successful authentication",
+  "type": "positive"
 }
-Все сценарии проходят JSON Schema validation.
+```
+
+---
+
+## 📋 Test Contract Validation
+
+Перед генерацией кода выполняется проверка контракта.
+
 Проверяется:
-- наличие обязательных полей;
+
+- обязательные поля;
 - корректность requirement_id;
-- покрытие всех требований;
-- отсутствие лишних данных.
-3. Генерация pytest кода
-Для каждого тест-кейса создается отдельный pytest файл.
-Пример:
-artifacts/generated/
+- наличие test steps;
+- покрытие всех требований.
 
-test_TC_001.py
-test_TC_002.py
-test_TC_003.py
-test_TC_004.py
-test_TC_005.py
-Пример сгенерированного теста:
+Если контракт невалидный:
+
+```
+ContractValidationError
+```
+
+останавливает pipeline.
+
+---
+
+## 🧪 Pytest Code Generation
+
+AI генерирует pytest тесты только на основании test contract.
+
+Пример результата:
+
+```python
 def test_TC_001():
-
     email = "<EMAIL>"
     password = "<PASSWORD>"
 
     pass
-На данном этапе создается тестовый каркас.
-4. AI Code Review
-После генерации pytest кода выполняется автоматический review через LLM.
+```
+
+Pipeline запрещает AI придумывать:
+
+- URL;
+- API endpoints;
+- HTTP методы;
+- UI элементы;
+- локаторы.
+
+---
+
+## 🔍 AI Code Review
+
+После генерации тестов выполняется AI review.
+
 Проверяется:
+
 - наличие pytest функции;
-- корректность структуры;
+- качество кода;
 - потенциальные проблемы;
-- рекомендации по улучшению.
-Ответ AI:
+- рекомендации.
+
+Ответ сохраняется в JSON формате:
+
+```json
 {
   "status": "passed",
   "issues": [],
   "recommendations": []
 }
-Используемые технологии
-Backend
+```
+
+---
+
+# 🛠 Tech Stack
+
+## Programming
+
 - Python 3.12
-- uv
+
+## Testing
+
 - pytest
-- jsonschema
-- PyYAML
-AI
+
+## AI
+
 - Ollama
-- Gemma LLM
-Quality Tools
-- ruff
+- Gemma / LLM models
+
+## Quality Tools
+
 - mypy
-Структура проекта
+- ruff
+
+## Environment
+
+- uv
+
+---
+
+# 📂 Project Structure
+
+```
 ai-driven-qa-pipeline/
 
 ├── input/
@@ -158,7 +232,7 @@ ai-driven-qa-pipeline/
 │       ├── scenario/
 │       ├── codegen/
 │       ├── code_reviewer/
-│       └── llm/
+│       └── contract_validator.py
 
 ├── artifacts/
 
@@ -171,3 +245,127 @@ ai-driven-qa-pipeline/
 ├── pyproject.toml
 
 └── README.md
+```
+
+---
+
+# ▶️ Installation
+
+Clone repository:
+
+```bash
+git clone https://github.com/PavelBord/ai-driven-qa-pipeline.git
+```
+
+Go to project:
+
+```bash
+cd ai-driven-qa-pipeline
+```
+
+Install dependencies:
+
+```bash
+uv sync
+```
+
+---
+
+# ▶️ Run Pipeline
+
+Запуск полного pipeline:
+
+```bash
+uv run python -m pipeline.full_pipeline
+```
+
+После выполнения создаются:
+
+```
+artifacts/
+
+├── pii/
+│   ├── pii-report.json
+│   └── masked-business-checklist.yaml
+
+├── scenarios/
+│   └── test-scenarios.json
+
+└── generated/
+    ├── test_TC_001.py
+    ├── test_TC_002.py
+    └── ...
+```
+
+---
+
+# ✅ Quality Gates
+
+## Pytest
+
+Запуск:
+
+```bash
+uv run pytest artifacts/generated
+```
+
+Результат:
+
+```
+5 passed
+```
+
+---
+
+## Mypy
+
+Проверка типов:
+
+```bash
+uv run mypy src
+```
+
+Результат:
+
+```
+Success: no issues found
+```
+
+---
+
+## Ruff
+
+Проверка качества:
+
+```bash
+uv run ruff check src
+```
+
+Результат:
+
+```
+All checks passed!
+```
+
+---
+
+# 🎯 Project Goal
+
+Цель проекта — показать применение AI в QA Automation:
+
+- уменьшение времени создания тестов;
+- повышение качества тестовых сценариев;
+- автоматизация повторяющихся QA процессов;
+- использование LLM как помощника инженера.
+
+---
+
+# 👨‍💻 Author
+
+Pavel Bordukov
+
+QA Automation Engineer
+
+GitHub:
+
+https://github.com/PavelBord
