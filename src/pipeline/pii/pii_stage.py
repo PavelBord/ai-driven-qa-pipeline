@@ -5,7 +5,7 @@ from typing import Any
 
 import yaml
 
-from pipeline.pii_guard import PIIGuard
+from pipeline.pii.pii_guard import PIIGuard
 
 
 def run_pii_stage(input_path: Path,output_dir: Path) -> None:

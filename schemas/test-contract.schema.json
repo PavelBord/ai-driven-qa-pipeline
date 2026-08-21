@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.com/schemas/test-contract.schema.json",
-  "title": "AI-driven QA Test Contract",
+  "title": "AI-driven QA Contract",
   "description": "Structured test contract generated from business requirements.",
   "type": "object",
   "additionalProperties": false,
