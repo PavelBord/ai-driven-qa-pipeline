@@ -42,8 +42,9 @@ class ScenarioGenerator:
         ):
 
             response = self.llm_client.generate(
-                prompt
-            )
+                prompt,
+                json_mode=True,
+        )
 
             try:
 
