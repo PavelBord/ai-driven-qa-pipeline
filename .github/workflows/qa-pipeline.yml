@@ -31,13 +31,15 @@ jobs:
 
 
       - name: Generate tests
+        env:
+           CI: true
         run: |
-          uv run python -m pipeline.full_pipeline
+            uv run python -m pipeline.full_pipeline
 
 
-      - name: Run tests
-        run: |
-          uv run pytest -q artifacts/generated
+- name: Run tests
+  run: |
+    uv run pytest -q artifacts/generated
 
 
       - name: Lint
