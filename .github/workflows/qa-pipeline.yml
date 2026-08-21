@@ -29,21 +29,26 @@ jobs:
           pip install uv
           uv sync
 
-       -name: Generate tests
-          run: uv run python -m pipeline.full_pipeline
+
+      - name: Generate tests
+        run: |
+          uv run python -m pipeline.full_pipeline
+
 
       - name: Run tests
         run: |
           uv run pytest -q artifacts/generated
-      
+
+
       - name: Lint
         run: |
           uv run ruff check src
 
+
       - name: Type check
         run: |
           uv run mypy src
-      
+
 
       - name: Upload artifacts
         if: always()
