@@ -4,26 +4,26 @@ import json
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
-
-SCHEMA_PATH = (Path(__file__).resolve().parents[2]/ "schemas"/ "test-contract.schema.json")
-
-
-class ContractValidationError(ValueError):
-    """Raised when a generated test contract is invalid."""
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 
 
-def validate_test_contract(data: Any) -> None:
-    """Validate a test contract against the project JSON Schema."""
+class ContractValidationError(Exception):
+    pass
 
-    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
-    validator = Draft202012Validator(schema)
-    errors = sorted(validator.iter_errors(data),key=lambda error: list(error.path))
+def validate_test_contract(contract: dict[str, Any]) -> None:
 
-    if not errors:
-        return
+    schema_path = Path(__file__).resolve().parents[2] / "schemas" / "test-contract.schema.json"
 
-    details = "\n".join(f"{list(error.path)}: {error.message}"for error in errors)
+    try:
+        schema_data = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    raise ContractValidationError(f"Invalid test contract:\n{details}")
+    except FileNotFoundError as exc:
+        raise ContractValidationError(f"Schema file not found: {schema_path}") from exc
+
+    try:
+        validate(instance=contract, schema=schema_data)
+
+    except ValidationError as exc:
+        raise ContractValidationError(str(exc)) from exc

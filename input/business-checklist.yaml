@@ -1,5 +1,5 @@
 project:
-  name: "AI-driven QA Demo"
+  name: "AI-driven QA "
 
 requirements:
   - id: "AUTH-001"

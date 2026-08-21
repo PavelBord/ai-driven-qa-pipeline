@@ -12,7 +12,7 @@ __pycache__/
 
 .DS_Store
 
-artifacts/
+artifacts
 allure-results/
 allure-report/
 
