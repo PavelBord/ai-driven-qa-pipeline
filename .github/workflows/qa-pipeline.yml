@@ -9,48 +9,39 @@ on:
 
 jobs:
   qa-pipeline:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
-
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-
       - name: Install dependencies
         run: |
           pip install uv
           uv sync
 
-
       - name: Generate tests
         env:
-           CI: true
+          CI: true
         run: |
-            uv run python -m pipeline.full_pipeline
+          uv run python -m pipeline.full_pipeline
 
-
-- name: Run tests
-  run: |
-    uv run pytest -q artifacts/generated
-
+      - name: Run tests
+        run: |
+          uv run pytest -q artifacts/generated
 
       - name: Lint
         run: |
           uv run ruff check src
 
-
       - name: Type check
         run: |
           uv run mypy src
-
 
       - name: Upload artifacts
         if: always()
