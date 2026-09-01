@@ -1,0 +1,70 @@
+application:
+  name: Demo Web Shop
+  url: https://demowebshop.tricentis.com
+
+
+pages:
+
+  - page_name: LoginPage
+    description: Login page
+    elements:
+      email:
+        locator: "#Email"
+        type: input
+
+      password:
+        locator: "#Password"
+        type: input
+
+      login_button:
+        locator: ".login-button"
+        type: button
+
+
+  - page_name: ProductPage
+    description: Product details page
+    elements:
+      add_to_cart_button:
+        locator: ".add-to-cart-button"
+        type: button
+
+
+  - page_name: CartPage
+    description: Shopping cart page
+    elements:
+      remove_button:
+        locator: ".remove-from-cart-button"
+        type: button
+
+
+requirements:
+
+  - id: USER-001
+    description: User can register account
+
+  - id: USER-002
+    description: User can login with valid credentials
+
+  - id: USER-003
+    description: User cannot login with invalid credentials
+
+  - id: PRODUCT-001
+    description: User can search products
+
+  - id: PRODUCT-002
+    description: User can open product details
+
+  - id: CART-001
+    description: User can add product to cart
+
+  - id: CART-002
+    description: User can update cart quantity
+
+  - id: CART-003
+    description: User can remove product from cart
+
+  - id: ORDER-001
+    description: User can complete checkout
+
+  - id: ORDER-002
+    description: User receives order confirmation

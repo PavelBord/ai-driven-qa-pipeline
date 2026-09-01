@@ -1,371 +1,134 @@
-# 🤖 AI-Driven QA Pipeline
+# AI-Driven QA Pipeline
 
-## 📌 Overview
+Генерация и исполнение Playwright-тестов на основе исходных требований и описания страниц с помощью локальной LLM (Ollama). Пайплайн закрывает весь цикл: от бизнес-чеклиста до готовых тестов, code review, баг-репортов и отчета о выполнении.
 
-AI-Driven QA Pipeline — автоматизированный pipeline для генерации и проверки pytest автотестов на основе бизнес-требований.
+## Возможности
 
-Проект демонстрирует использование LLM в процессе QA Automation:
+- Генерация Playwright-тестов из бизнес-чеклиста (YAML) с помощью LLM
+- Автоматическое создание page objects по описанию страниц
+- Маскирование PII-данных до отправки в LLM
+- Автоматический code review сгенерированного кода
+- Генерация баг-репортов по результатам code review и выполнения тестов
+- Запуск сгенерированных тестов и формирование сводки
+- Mock LLM client для CI и оффлайн-проверок (без запуска Ollama)
+- Статические проверки: `ruff`, `mypy` (для сгенерированного кода — также `black`)
 
-- анализ требований;
-- защита тестовых данных от утечки PII;
-- генерация тестовых сценариев;
-- создание test contract;
-- генерация pytest-кода;
-- AI code review;
-- автоматическая проверка качества кода.
+## Требования
 
-Основная идея проекта:
+- Python 3.12 (`>=3.12,<3.13`)
+- `uv` (менеджер зависимостей)
+- Ollama с моделью LLM (по умолчанию `gemma4:12b`) для локальной генерации
+- Браузеры Playwright (для исполнения тестов)
 
-> Превратить бизнес-требование в готовый проверенный автотест с помощью AI.
+## Быстрый старт
 
----
+```bash
+# 1. Установка зависимостей
+uv sync
 
-# 🏗 Architecture
+# 2. Установка браузеров Playwright (для исполнения)
+uv run playwright install chromium
 
-Pipeline состоит из следующих этапов:
+# 3. Запуск полного пайплайна (требует запущенного Ollama)
+uv run python -m pipeline.full_pipeline
 
-```
-Business Requirements
-        |
-        v
-+----------------+
-|  PII Detection |
-|  & Masking     |
-+----------------+
-        |
-        v
-+----------------+
-| AI Scenario    |
-| Generator      |
-+----------------+
-        |
-        v
-+----------------+
-| Test Contract  |
-| Validation     |
-+----------------+
-        |
-        v
-+----------------+
-| Pytest Code    |
-| Generation     |
-+----------------+
-        |
-        v
-+----------------+
-| AI Code Review |
-+----------------+
-        |
-        v
-Generated Tests
+# 4. Для CI / оффлайн — запуск с mock LLM (без Ollama)
+CI=true uv run python -m pipeline.full_pipeline
 ```
 
----
-
-# 🚀 Features
-
-## 🔐 PII Protection
-
-Перед передачей данных в AI pipeline выполняется проверка персональных данных.
-
-Поддерживается:
-
-- email detection;
-- password detection;
-- masking sensitive information.
-
-Пример:
-
-До:
-
-```yaml
-email: user@example.com
-password: secret123
-```
-
-После:
-
-```yaml
-email: <EMAIL>
-password: <PASSWORD>
-```
-
----
-
-## 🧠 AI Scenario Generation
-
-LLM анализирует бизнес-требования и создает тестовые сценарии.
-
-Генерируется:
-
-- test case ID;
-- requirement ID;
-- title;
-- description;
-- priority;
-- test steps;
-- expected result.
-
-Пример:
-
-```json
-{
-  "id": "TC-001",
-  "requirement_id": "AUTH-001",
-  "title": "Successful authentication",
-  "type": "positive"
-}
-```
-
----
-
-## 📋 Test Contract Validation
-
-Перед генерацией кода выполняется проверка контракта.
-
-Проверяется:
-
-- обязательные поля;
-- корректность requirement_id;
-- наличие test steps;
-- покрытие всех требований.
-
-Если контракт невалидный:
-
-```
-ContractValidationError
-```
-
-останавливает pipeline.
-
----
-
-## 🧪 Pytest Code Generation
-
-AI генерирует pytest тесты только на основании test contract.
-
-Пример результата:
-
-```python
-def test_TC_001():
-    email = "<EMAIL>"
-    password = "<PASSWORD>"
-
-    pass
-```
-
-Pipeline запрещает AI придумывать:
-
-- URL;
-- API endpoints;
-- HTTP методы;
-- UI элементы;
-- локаторы.
-
----
-
-## 🔍 AI Code Review
-
-После генерации тестов выполняется AI review.
-
-Проверяется:
-
-- наличие pytest функции;
-- качество кода;
-- потенциальные проблемы;
-- рекомендации.
-
-Ответ сохраняется в JSON формате:
-
-```json
-{
-  "status": "passed",
-  "issues": [],
-  "recommendations": []
-}
-```
-
----
-
-# 🛠 Tech Stack
-
-## Programming
-
-- Python 3.12
-
-## Testing
-
-- pytest
-
-## AI
-
-- Ollama
-- Gemma / LLM models
-
-## Quality Tools
-
-- mypy
-- ruff
-
-## Environment
-
-- uv
-
----
-
-# 📂 Project Structure
+## Структура проекта
 
 ```
 ai-driven-qa-pipeline/
-
-├── input/
-│   └── business-checklist.yaml
-
-├── prompts/
-│   ├── test-scenario-generation.txt
-│   ├── test-code-generation.txt
-│   └── code-review.txt
-
+├── input/                         # Исходные бизнес-чеклисты
+│   └── demo-web-shop-checklist.yaml
+├── prompts/                       # Шаблоны промптов для LLM
+├── schemas/                       # JSON-схемы контрактов
 ├── src/
+│   ├── page_objects/              # Готовые page objects (пример)
 │   └── pipeline/
-│       ├── pii/
-│       ├── scenario/
-│       ├── codegen/
-│       ├── code_reviewer/
-│       └── contract_validator.py
-
-├── artifacts/
-
-│   ├── pii/
-│   ├── scenarios/
-│   └── generated/
-
+│       ├── bug_report/            # Генератор баг-репортов
+│       ├── code_reviewer/         # Code review сгенерированного кода
+│       ├── codegen/               # Генерация и валидация кода
+│       ├── execution/             # Запуск тестов
+│       ├── llm/                   # LLM клиенты (Ollama, Mock)
+│       ├── page_objects/          # Генерация page objects
+│       ├── pii/                   # Маскирование PII
+│       ├── scenario/              # Генерация сценариев
+│       ├── config.py              # Пути к директориям
+│       ├── contract_validator.py  # Проверка контракта
+│       ├── reporting.py           # Манифест и отчеты
+│       └── full_pipeline.py       # Точка входа пайплайна
 ├── tests/
-
+│   ├── unit/                      # Юнит-тесты (49 тестов)
+│   └── e2e/                       # Playwright e2e на demo-shop
+├── artifacts/                     # Результаты (в .gitignore)
+├── .github/workflows/qa-pipeline.yml  # CI
+├── .pre-commit-config.yaml
 ├── pyproject.toml
-
-└── README.md
+└── uv.lock
 ```
 
----
+## Как это работает
 
-# ▶️ Installation
+Бизнес-чеклист (`input/*.yaml`) содержит:
 
-Clone repository:
+- `application` — имя и URL приложения
+- `pages` — описания страниц и элементов (locator, type)
+- `requirements` — пользовательские требования (USER-001, PRODUCT-001 и т.д.)
 
-```bash
-git clone https://github.com/PavelBord/ai-driven-qa-pipeline.git
-```
+Пайплайн выполняет следующие шаги:
 
-Go to project:
+1. **PII-стадия** — маскирует чувствительные значения (пароли, токены, email) перед отправкой в LLM
+2. **Генерация page objects** — создаёт код страниц из раздела `pages`
+3. **Генерация сценариев** — строит тест-контракт с тест-кейсами по требованиям
+4. **Генерация кода тестов** — LLM пишет Playwright-тесты по контракту и page objects
+5. **Code review** — проверка сгенерированного кода, при неудаче — баг-репорт
+6. **Валидация кода** — AST-проверки: одна `test_*` функция, запрет прямых `page.click/fill/goto`, запрет хардкод-локаторов
+7. **Исполнение** — запуск сгенерированных тестов, сводка и баг-репорты по падениям
+8. **Манифест** — `artifacts/manifest.json` со всеми созданными артефактами
 
-```bash
-cd ai-driven-qa-pipeline
-```
+## Результаты
 
-Install dependencies:
-
-```bash
-uv sync
-```
-
----
-
-# ▶️ Run Pipeline
-
-Запуск полного pipeline:
-
-```bash
-uv run python -m pipeline.full_pipeline
-```
-
-После выполнения создаются:
+Все артефакты попадают в `artifacts/`:
 
 ```
 artifacts/
-
-├── pii/
-│   ├── pii-report.json
-│   └── masked-business-checklist.yaml
-
-├── scenarios/
-│   └── test-scenarios.json
-
-└── generated/
-    ├── test_TC_001.py
-    ├── test_TC_002.py
-    └── ...
+├── pii/            # Маскированный чеклист
+├── pages/          # Сгенерированные page objects
+├── scenarios/      # test-scenarios.json (тест-контракт)
+├── generated/      # Сгенерированные Playwright-тесты
+├── code-review/    # Результаты ревью
+├── bug-reports/    # Баг-репорты
+├── execution/      # Сводка выполнения тестов
+└── manifest.json
 ```
 
----
-
-# ✅ Quality Gates
-
-## Pytest
-
-Запуск:
+## Тестирование проекта
 
 ```bash
-uv run pytest artifacts/generated
-```
+# Юнит-тесты
+uv run pytest
 
-Результат:
+# Юнит + e2e
+uv run pytest tests/unit tests/e2e
 
-```
-5 passed
-```
-
----
-
-## Mypy
-
-Проверка типов:
-
-```bash
+# Статические проверки
+uv run ruff check src tests
 uv run mypy src
-```
-
-Результат:
 
 ```
-Success: no issues found
-```
 
----
+## CI/CD
 
-## Ruff
+GitHub Actions workflow `.github/workflows/qa-pipeline.yml`:
 
-Проверка качества:
+- генерация тестов с mock LLM (`CI=true`)
+- исполнение сгенерированных тестов
+- качество сгенерированного кода (`black --check`, `ruff`)
+- линт + type check исходников
+- загрузка артефактов
 
-```bash
-uv run ruff check src
-```
+## Лицензия
 
-Результат:
-
-```
-All checks passed!
-```
-
----
-
-# 🎯 Project Goal
-
-Цель проекта — показать применение AI в QA Automation:
-
-- уменьшение времени создания тестов;
-- повышение качества тестовых сценариев;
-- автоматизация повторяющихся QA процессов;
-- использование LLM как помощника инженера.
-
----
-
-# 👨‍💻 Author
-
-Pavel Bordukov
-
-QA Automation Engineer
-
-GitHub:
-
-https://github.com/PavelBord
+MIT — см. файл [LICENSE](LICENSE).

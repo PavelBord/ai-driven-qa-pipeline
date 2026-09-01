@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+import logging
 from typing import Any
 
+from pipeline.config import PROMPTS_DIR
 from pipeline.llm.client import LLMClient
 
-PROMPT_PATH = Path("prompts/code-review.txt")
+LOG = logging.getLogger(__name__)
+
+PROMPT_PATH = PROMPTS_DIR / "code-review.txt"
 
 
 class CodeReviewer:
@@ -39,9 +42,7 @@ class CodeReviewer:
             prompt
         )
 
-        print("\n===== CODE REVIEW RESPONSE =====")
-        print(response)
-        print("================================\n")
+        LOG.debug("Code review response: %s", response)
 
         return self._parse_response(
             response

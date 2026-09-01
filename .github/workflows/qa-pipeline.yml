@@ -25,6 +25,10 @@ jobs:
           pip install uv
           uv sync
 
+      - name: Install Playwright browsers
+        run: |
+          uv run playwright install --with-deps chromium
+
       - name: Generate tests
         env:
           CI: true
@@ -32,12 +36,19 @@ jobs:
           uv run python -m pipeline.full_pipeline
 
       - name: Run tests
+        env:
+          QA_SANDBOX: "1"
         run: |
           uv run pytest -q artifacts/generated
 
+      - name: Code quality gates on generated code
+        run: |
+          uv run black --check $(find artifacts/generated artifacts/pages -name '*.py')
+          uv run ruff check $(find artifacts/generated artifacts/pages -name '*.py')
+
       - name: Lint
         run: |
-          uv run ruff check src
+          uv run ruff check src tests
 
       - name: Type check
         run: |

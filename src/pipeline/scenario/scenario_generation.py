@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
+from pipeline.config import PROMPTS_DIR
 from pipeline.contract_validator import ContractValidationError, validate_test_contract
 from pipeline.llm.client import LLMClient
 
-PROMPT_PATH = Path("prompts/test-scenario-generation.txt")
+PROMPT_PATH = PROMPTS_DIR / "test-scenario-generation.txt"
 
 
 def load_prompt() -> str:
@@ -66,6 +66,10 @@ class ScenarioGenerator:
                     checklist,
                 )
 
+                self._validate_unique_ids(
+                    contract
+                )
+
                 return contract
 
 
@@ -81,7 +85,8 @@ class ScenarioGenerator:
                     break
 
                 prompt = self._build_prompt(
-                    checklist
+                    checklist,
+                    feedback=str(exc),
                 )
 
 
@@ -95,6 +100,7 @@ class ScenarioGenerator:
     @staticmethod
     def _build_prompt(
         checklist: dict[str, Any],
+        feedback: str = "",
     ) -> str:
 
         return load_prompt().replace(
@@ -104,6 +110,9 @@ class ScenarioGenerator:
                 indent=2,
                 ensure_ascii=False,
             ),
+        ).replace(
+            "{feedback}",
+            feedback or "Отсутствуют.",
         )
 
 
@@ -249,4 +258,36 @@ class ScenarioGenerator:
             raise ContractValidationError(
                 f"Missing test coverage: "
                 f"{sorted(missing)}"
+            )
+
+
+    @staticmethod
+    def _validate_unique_ids(
+        contract: dict[str, Any],
+    ) -> None:
+
+        ids = [
+            test_case.get(
+                "id"
+            )
+            for test_case in contract.get(
+                "test_cases",
+                [],
+            )
+        ]
+
+        duplicates = sorted(
+            {
+                test_id
+                for test_id in ids
+                if test_id is not None
+                and ids.count(test_id) > 1
+            }
+        )
+
+        if duplicates:
+
+            raise ContractValidationError(
+                f"Duplicate test case ids: "
+                f"{duplicates}"
             )
