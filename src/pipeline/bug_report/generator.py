@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from pipeline.config import BUG_REPORT_DIR
 from pipeline.llm.client import LLMClient
 
 
@@ -71,6 +73,25 @@ AI анализ:
 """.strip()
 
 
+def load_prompt() -> str:
+    return BUG_REPORT_PROMPT
+
+
+FIRST_FENCE = "```"
+
+
+def _strip_fences(text: str) -> str:
+    cleaned = text.strip()
+    if cleaned.startswith(FIRST_FENCE):
+        first_newline = cleaned.find("\n")
+        if first_newline != -1:
+            cleaned = cleaned[first_newline + 1 :]
+    closing = cleaned.rfind(FIRST_FENCE)
+    if closing != -1:
+        cleaned = cleaned[:closing]
+    return cleaned.strip()
+
+
 class BugReportGenerator:
     """
     Generate structured bug reports using LLM.
@@ -90,6 +111,13 @@ class BugReportGenerator:
     @staticmethod
     def _parse_response(response: str) -> BugReport:
 
-        data = json.loads(response)
+        data = json.loads(_strip_fences(response))
 
         return BugReport.model_validate(data)
+
+    @staticmethod
+    def save(report: BugReport, test_case_id: str) -> Path:
+        BUG_REPORT_DIR.mkdir(parents=True, exist_ok=True)
+        file_path = BUG_REPORT_DIR / f"{test_case_id}.json"
+        file_path.write_text(report.model_dump_json(indent=2), encoding="utf-8")
+        return file_path

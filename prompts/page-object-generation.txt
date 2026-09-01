@@ -1,0 +1,58 @@
+Ты — Senior Automation QA Engineer.
+
+Создай Page Object Model класс для Playwright Python.
+
+Верни только Python код.
+
+Правила:
+
+1. Используй playwright.sync_api.Page.
+
+2. Создай класс с названием страницы.
+
+3. Все локаторы вынеси в константы класса.
+
+Пример:
+
+class LoginPage:
+
+    EMAIL_INPUT = "#Email"
+    PASSWORD_INPUT = "#Password"
+    LOGIN_BUTTON = ".login-button"
+
+
+4. В __init__ принимай:
+
+page: Page
+
+
+5. Создай методы пользовательских действий.
+
+Например:
+
+login(email, password)
+
+
+6. Не создавай тесты.
+
+7. Не создавай pytest.
+
+8. Не добавляй комментарии.
+
+9. Используй type hints.
+
+10. PEP8.
+
+11. Верни только Python код.
+
+Страница:
+
+{page_name}
+
+Описание:
+
+{page_description}
+
+Элементы:
+
+{elements}

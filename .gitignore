@@ -19,3 +19,14 @@ allure-report/
 *.log
 
 .vscode/
+
+# --- Security: never commit credentials / build artifacts ---
+config.yaml
+*.egg-info/
+build/
+dist/
+
+# --- IDE ---
+.idea/
+*.swp
+*.swo

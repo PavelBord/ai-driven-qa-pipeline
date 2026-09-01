@@ -70,7 +70,7 @@ class PIIGuard:
             current_path = self._build_path(path, str(key))
             pii_type = self._get_sensitive_field_type(key)
 
-            if pii_type and value is not None:
+            if pii_type and isinstance(value, str):
                 result[key] = self._mask_field(pii_type,current_path,matches)
                 continue
 
