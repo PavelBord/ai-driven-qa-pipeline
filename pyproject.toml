@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "AI-driven QA pipeline for Playwright testing"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-authors = [{name = "Your Name", email = "your.email@example.com"}]
+authors = [{name = "Pavel", email = "pavelbordukov20@gmail.com"}]
 dependencies = [
     "httpx>=0.28.1",
     "jsonschema>=4.26.0",
